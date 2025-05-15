@@ -1,0 +1,15 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+%}
+<h1 align="center">Hello {{user.fname}}</h1>
+<div align="text-align: center;">
+<form method="POST" style="display: inline-block;">
+   <input type="hidden" name="action" value="time_in">
+   <button type="submit" class="btn btn-primary">Time in</button>  
+</form>
+
+<form method="POST" style="display: inline-block;">   
+  <input type="hidden" name="action" value="time_out">
+  <button type="submit" class="btn btn-primary">Time out</button>
+  </div>
+</form>
+{% endblock %}

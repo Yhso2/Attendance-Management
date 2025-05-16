@@ -28,7 +28,7 @@ def create_app():
    
     from .models import emp
     
-    create_database(app)
+    initialize_admin(app)
     
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
@@ -41,18 +41,26 @@ def create_app():
     return app
 
 
-def create_database(app):
-    from .models import emp
-    from . import db
-    if not path.exists('instance/' + DB_NAME):     
-        with app.app_context():
-            db.create_all()  
-            admin_user = emp(username='admin', fname='admin', name='admin', password=generate_password_hash('admin'))
+def initialize_admin(app):
+    with app.app_context():
+        from .models import emp   
+        db_path = path.join(app.instance_path, DB_NAME)    
+        if not path.exists(db_path):
+             print("[INFO] No DB found. Please run 'flask db upgrade' to create schema.")
+             return 
+                
+        if not emp.query.filter_by(username='admin').first():
+            admin_user = emp(username='admin', 
+                             fname='admin', 
+                             name='admin', 
+                             password=generate_password_hash('admin'))
             try:
                 db.session.add(admin_user)
                 db.session.commit()
+                print("[INFO] Admin user created successfully.")
             except Exception as e:
                 db.session.rollback()
-                
+                print(f"[ERROR] Failed to create admin user: {e}")
+            
+
    
-        

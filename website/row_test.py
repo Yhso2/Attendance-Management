@@ -2,14 +2,14 @@ import gspread
 import datetime
 import os
 from oauth2client.service_account import ServiceAccountCredentials
-from google.oauth2 import service_account
+# from google.oauth2 import service_account
 
 def get_credentials():
     # Define the scope of Google Sheets API access
     scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    creds_path = os.path.join(BASE_DIR, 'bcreds.json')
+    creds_path = os.path.join(BASE_DIR, 'creds.json')
 
     # Path to your service account JSON key file
     credentials = ServiceAccountCredentials.from_json_keyfile_name(creds_path, scope)
@@ -24,6 +24,12 @@ def get_credentials():
     #worksheet = spreadsheet.worksheet('Sheet1')  # Change 'Sheet1' to your worksheet name
         
     return spreadsheet
+
+
+def get_worksheet(username):
+    spreadsheet = get_credentials()
+    return spreadsheet.worksheet(username) 
+   
 
 
 def get_date():
@@ -41,9 +47,8 @@ def get_time():
     formatted_time = current_datetime.strftime("%I:%M %p")
     return formatted_time
 
-  
-def date_match(rowval, trow,):
-    worksheet = get_credentials().worksheet('Sheet1')
+
+def date_match(worksheet, rowval, trow):
     rownum = trow
     crnt_date = get_date()
     Colb_values = worksheet.col_values(2)
@@ -67,25 +72,23 @@ def date_match(rowval, trow,):
      return rownum+diff+2 # Exit the loop     #Plus 1 kase space for sa total hours of the day
     
 
-def dateget():
-    worksheet = get_credentials().worksheet('Sheet1')
+def dateget(worksheet):
+    # Get all values from the specified column
     column_values = worksheet.col_values(1)    
     # Iterate through the column values in reverse order
     for i in range(len(column_values) - 1, -1, -1):
         if column_values[i]:  
            return i + 1
-        
-def check(cell, collumn):
-    worksheet = get_credentials().worksheet('Sheet1')
-    if worksheet.cell(cell, collumn).value is None or '':
+
+def check(worksheet, cell, column):    
+    if worksheet.cell(cell, column).value is None or '':
       return True
     else:
       return False
                           
 
 
-def targetrow():
-    worksheet = get_credentials().worksheet('Sheet1')
+def targetrow(worksheet):    
     trow = None
     rowval = None   
     # Get all values from the specified column
@@ -99,7 +102,7 @@ def targetrow():
 
     if trow is not None and trow != 2:   
      # Store the value of the last non-empty cell as a variable
-     target = date_match(rowval, trow) 
+     target = date_match(worksheet, rowval, trow) 
      return target    
     else: 
      return trow+1

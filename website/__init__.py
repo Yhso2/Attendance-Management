@@ -11,7 +11,7 @@ migrate = Migrate()
 DB_NAME = "database.db"
 
 
-def create_app():
+def create_app(): # Create and configure the Flask application
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'hjshjhdjah kjssaddshkjdhjs'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
@@ -41,7 +41,7 @@ def create_app():
     return app
 
 
-def initialize_admin(app):
+def initialize_admin(app): # Initialize admin user if not exists
     with app.app_context():
         from .models import emp   
         db_path = path.join(app.instance_path, DB_NAME)    

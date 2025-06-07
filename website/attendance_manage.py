@@ -1,15 +1,16 @@
-from .row_test import get_credentials, get_time, get_date, targetrow, dateget, date_match
+from .row_test import get_credentials, get_time, get_date, targetrow, get_row, date_match
     
 def handle_attendance(user, action):
     try:
         creds = get_credentials()
         worksheet = creds.worksheet(user.username)
-        date = get_date()
-        row = dateget()
-        tdate = worksheet.cell(row, 1).value
-        frow = date_match(worksheet, tdate, row)
+        date = get_date()      # Get Latest Date
+        row = get_row(worksheet, 1)        # Get the last non-empty row in column A :: To know target row of latest date        # 3
+        if row:
+            latest_date = worksheet.cell(row, 1).value      # Get the latest date value                                 # date 
+            frow = date_match(worksheet, latest_date, row, date)
 
-        if tdate != date:
+        if latest_date != date:
             worksheet.update_cell(frow, 1, date)
 
         Time = get_time()

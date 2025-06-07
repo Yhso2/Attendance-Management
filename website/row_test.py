@@ -19,13 +19,10 @@ def get_credentials():
 
     # Open the spreadsheet by its title
     spreadsheet = gc.open('DITO')
-
-    # Select a specific worksheet within the spreadsheet by its title
-    #worksheet = spreadsheet.worksheet('Sheet1')  # Change 'Sheet1' to your worksheet name
         
     return spreadsheet
 
-
+# Helper function to get the worksheet by username if needed
 def get_worksheet(username):
     spreadsheet = get_credentials()
     return spreadsheet.worksheet(username) 
@@ -48,37 +45,37 @@ def get_time():
     return formatted_time
 
 
-def date_match(worksheet, rowval, trow):
-    rownum = trow
-    crnt_date = get_date()
-    Colb_values = worksheet.col_values(2)
-    if rowval == crnt_date: # Same date following time-in
-       if len(Colb_values)<rownum:
-          return rownum
-       else:    
-        if len(Colb_values) > rownum:
-         diff = len(Colb_values) - rownum
-         rownum = rownum+1+diff
-         return rownum
+def date_match(worksheet, latest_date, row, current_date):     
+    Column_B_values = worksheet.col_values(2)
+    if latest_date == current_date:  # Checks if the target row date value is the same with the current date
+        if len(Column_B_values) < row:
+            return row
         else:
-           return rownum+1
-    else: # Not the same date
-        rownum+=1 
-        
-    if len(Colb_values) < rownum : # checks len of column B
-     return rownum  # Exit the loop  
-    else:
-     diff = len(Colb_values) - rownum
-     return rownum+diff+2 # Exit the loop     #Plus 1 kase space for sa total hours of the day
-    
+            if len(Column_B_values) > row:
+                diff = len(Column_B_values) - row
+                row = row + 1 + diff
+                return row
+            else:
+                return row + 1
+    else:  # Not the same date
+        row = get_row(worksheet, 2)  # Get the last non-empty row in column B (Time-in Column)
+        row += 1
 
-def dateget(worksheet):
+    if len(Column_B_values) < row:  # checks len of column B
+        return row    # Exit the loop
+    else:
+     diff = len(Column_B_values) - row
+     return row + diff + 2 # Exit the loop     #Plus 1 kase space for sa total hours of the day
+
+def get_row(worksheet, column): # Get the last non-empty row in column A (Date Column)
     # Get all values from the specified column
-    column_values = worksheet.col_values(1)    
+    column_values = worksheet.col_values(column)    
     # Iterate through the column values in reverse order
-    for i in range(len(column_values) - 1, -1, -1):
-        if column_values[i]:  
+    for i in reversed(range(len(column_values))):
+        if column_values[i].strip() and not column_values[i] == "Date" and not column_values[i] == "Time-In":  # Check if the cell value is not empty
            return i + 1
+    return False # Return false if no date is found in the column
+
 
 def check(worksheet, cell, column):    
     if worksheet.cell(cell, column).value is None or '':

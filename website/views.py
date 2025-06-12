@@ -3,8 +3,8 @@ from flask_login import login_required, current_user
 from .row_test import *
 from . import db
 from .attendance_manage import handle_attendance
-import json
-import gspread
+
+
 
 
 views = Blueprint('views', __name__)
@@ -14,7 +14,7 @@ views = Blueprint('views', __name__)
 def home():    
     username = request.args.get('username') 
     message = ''     
-
+  # date_update(current_user)  # Ensure the date is updated for the current user
     if request.method == 'POST':              
              action = request.form['action']
              success, message = handle_attendance(current_user, action)
@@ -29,7 +29,7 @@ def homead():
              action = request.form['action']
 
              if action == 'time_in':
-              Cell= targetrow()
+              Cell= target_row()
               #worksheet.update_cell({Cell}, 2, {Time})
               flash('Time in recorded!', category='success')
 
